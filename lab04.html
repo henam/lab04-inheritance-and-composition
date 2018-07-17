@@ -1,0 +1,1745 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>COSC346 Week 4 - Inheritance and Composition</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   	<link rel="stylesheet" type="text/css" href="http://cs.otago.ac.nz/cosc346/labs/phplabbook/labbookswift.css">
+	<link rel="stylesheet" type="text/css" href="http://cs.otago.ac.nz/cosc346/labs/cosc346labstyle.css">
+	<script src="http://cs.otago.ac.nz/cosc346/labs/jquery-1.11.1.min.js"></script>
+	<script src="http://cs.otago.ac.nz/cosc346/labs/toc.min.js"></script>
+	<script src="http://cs.otago.ac.nz/cosc346/labs/cosc346labscript.js"></script>
+</head>
+<body>
+
+	<!-- Banner -->
+	<div class="banner">
+		<a href="http://cs.otago.ac.nz/cosc346/labs/../labs.php">COSC346 - Object Oriented Programming and User Interfaces</a>
+	</div>
+		
+	<!-- Lab title -->		
+	<h1>Week 4 - Inheritance and Composition</h1>
+	
+	<!-- Table of Contents -->
+	<div id="toc"></div>
+		
+		
+	<h2>Goals</h2>
+	<div class="block">
+		<ul class="toplist">
+			<li>To create a container library using inheritance</li>
+			<li>To rewrite the library replacing using composition</li>	
+		</ul>
+	</div>
+		
+		
+	<h2>Preparation</h2>
+	<div class="block">
+	<ul class="toplist">
+		<li>From Apple's "The Swift Programming Language" read:
+		<ul>
+			<li><a href="https://developer.apple.com/library/ios/documentation/Swift/Conceptual/Swift_Programming_Language/Inheritance.html#//apple_ref/doc/uid/TP40014097-CH17-ID193">Inheritance</a></li>
+			<li><a href="https://developer.apple.com/library/prerelease/ios/documentation/Swift/Conceptual/Swift_Programming_Language/Extensions.html">Extensions</a></li>
+			<li><a href="https://developer.apple.com/library/ios/documentation/Swift/Conceptual/Swift_Programming_Language/Subscripts.html#//apple_ref/doc/uid/TP40014097-CH16-ID305">Subscripts</a></li>
+		</ul>
+		</li>
+	</ul>
+	</div>
+
+	<h2>Simple Container Library I</h2>
+	<div class="block">
+		
+		<p>
+		In this lab you will develop a container library—let’s call it SCL for Simple Container Library.  This should give you some practice with inheritance and composition.  The Foundation framework provides its own, more complete and powerful, set of containers, which you’ll start using in the following labs.  The ones you are going to create in this lab will have some of the same functionality, and similar basic principles.  This should give you an idea on how containers work, which might be helpful later on when using the classes provided by the Foundation framework.  		</p>
+
+		<p>
+		The hierarchy of the first version of SCL will be as shown in the figure below:		</p>
+		
+		<img class="block" src="images/scl.png" style="max-width:640px;max-height:271px" title="SCL hierarchy">
+
+		<p>
+		The base class for all the containers will be the <em><span class="swiftcode"><span class="swiftdefined">LinkedList</span></span></em>, which will be a direct parent of the <em><span class="swiftcode"><span class="swiftdefined">SortableList</span></span></em>, the <em><span class="swiftcode"><span class="swiftdefined">Stack</span></span></em> and the <em><span class="swiftcode"><span class="swiftdefined">Queue</span></span></em>.  The <em><span class="swiftcode"><span class="swiftdefined">SortableList</span></span></em> will also be the superclass of the <em><span class="swiftcode"><span class="swiftdefined">Array</span></span></em> class.  Hopefully these data structures are vaguely familiar to you—you have implemented some of them in the data structures papers.		</p>	
+	  <h3>Linked list</h3>		
+<p>
+		Create a new <em>OS X / Application / Command Line Tool</em> project in Xcode and call it <em>prog4.1</em>.  Download the following file with implementation of the <em><span class="swiftcode"><span class="swiftdefined">LinkedList</span></span></em> class.  Add the file to your project—to download the entire file just click on the file name link at the top of the code box:
+		</p>
+		
+		<div class="codeblock">
+<div class="codeblocktitle"><a href="code/01/LinkedList.swift">LinkedList.swift</a></div>
+<pre class="linenumbers unselectable" style="float: left;">001:
+002:
+003:
+004:
+005:
+006:
+007:
+008:
+009:
+010:
+011:
+012:
+013:
+014:
+015:
+016:
+017:
+018:
+019:
+020:
+021:
+022:
+023:
+024:
+025:
+026:
+027:
+028:
+029:
+030:
+031:
+032:
+033:
+034:
+035:
+036:
+037:
+038:
+039:
+040:
+041:
+042:
+043:
+044:
+045:
+046:
+047:
+048:
+049:
+050:
+051:
+052:
+053:
+054:
+055:
+056:
+057:
+058:
+059:
+060:
+061:
+062:
+063:
+064:
+065:
+066:
+067:
+068:
+069:
+070:
+071:
+072:
+073:
+074:
+075:
+076:
+077:
+078:
+079:
+080:
+081:
+082:
+083:
+084:
+085:
+086:
+087:
+088:
+089:
+090:
+091:
+092:
+093:
+094:
+095:
+096:
+097:
+098:
+099:
+100:
+101:
+102:
+103:
+104:
+105:
+106:
+107:
+108:
+109:
+110:
+111:
+112:
+113:
+114:
+115:
+116:
+117:
+118:
+119:
+120:
+121:
+122:
+123:
+124:
+125:
+126:
+127:
+128:
+129:
+130:
+131:
+132:
+133:
+134:
+135:
+136:
+137:
+138:
+139:
+140:
+141:
+142:
+143:
+144:
+145:
+146:
+147:
+148:
+149:
+150:
+151:
+152:
+153:
+154:
+155:
+156:
+157:
+158:
+159:
+160:
+161:
+162:
+163:
+164:
+165:
+166:
+167:
+168:
+169:
+170:
+171:
+172:
+173:
+174:
+175:
+176:
+177:
+178:
+179:
+180:
+181:
+182:
+183:
+184:
+185:
+186:
+187:
+188:
+189:
+190:
+191:
+192:
+193:
+194:
+195:
+196:
+197:
+198:
+199:
+200:
+201:
+202:
+203:
+204:
+205:
+206:
+207:
+208:
+209:
+210:
+211:
+212:
+213:
+214:
+215:
+216:
+217:
+218:
+219:
+220:
+221:
+222:
+223:
+224:
+225:
+226:
+227:
+228:
+229:
+230:
+231:
+232:
+233:
+234:
+235:
+236:
+237:
+238:
+239:
+240:
+241:
+242:
+243:
+244:
+245:
+246:
+247:
+248:
+249:
+250:
+251:
+252:
+253:
+</pre><pre class="code">
+<span class="swiftcode"><span class="swiftcomment">/**</span></span>
+<span class="swiftcode"><span class="swiftcomment">A list node containing a reference to an object</span></span>
+<span class="swiftcode"><span class="swiftcomment">and a reference to the next node</span></span>
+<span class="swiftcode"><span class="swiftcomment"></span></span>
+<span class="swiftcode"><span class="swiftcomment">*/</span></span>
+<span class="swiftcode"><span class="swiftkeyword">class</span> <span class="swiftdefined">Node</span> {</span>
+<span class="swiftcode">    </span>
+<span class="swiftcode">    <span class="swiftcomment">// STORED PROPERTIES</span></span>
+<span class="swiftcode">    </span>
+<span class="swiftcode">    <span class="swiftkeyword">var</span> object: <span class="swiftclass">Any</span>  <span class="swiftcomment">//Reference to the listed object</span></span>
+<span class="swiftcode">    <span class="swiftkeyword">var</span> next : <span class="swiftdefined">Node</span>?       <span class="swiftcomment">//Optional reference to the next node</span></span>
+<span class="swiftcode"></span>
+<span class="swiftcode">    <span class="swiftcomment">// INITIALISERS</span></span>
+<span class="swiftcode">    </span>
+<span class="swiftcode">    <span class="swiftcomment">/**</span></span>
+<span class="swiftcode"><span class="swiftcomment">    Designated initialiser</span></span>
+<span class="swiftcode"><span class="swiftcomment">    </span></span>
+<span class="swiftcode"><span class="swiftcomment">    - parameter object: Object referenced by the node</span></span>
+<span class="swiftcode"><span class="swiftcomment">    */</span></span>
+<span class="swiftcode">    <span class="swiftkeyword">init</span>(object: <span class="swiftclass">Any</span>) {</span>
+<span class="swiftcode">        <span class="swiftkeyword">self</span>.object = object</span>
+<span class="swiftcode">        <span class="swiftcomment">// By default, this node</span></span>
+<span class="swiftcode">        <span class="swiftcomment">// doesn't have a next node</span></span>
+<span class="swiftcode">        <span class="swiftcomment">// to point to</span></span>
+<span class="swiftcode">        <span class="swiftkeyword">self</span>.next = nil;</span>
+<span class="swiftcode">    }</span>
+<span class="swiftcode">}</span>
+<span class="swiftcode"></span>
+<span class="swiftcode"><span class="swiftcomment">/**</span></span>
+<span class="swiftcode"><span class="swiftcomment">Linked list of objects</span></span>
+<span class="swiftcode"><span class="swiftcomment"></span></span>
+<span class="swiftcode"><span class="swiftcomment">*/</span></span>
+<span class="swiftcode"><span class="swiftkeyword">class</span> <span class="swiftdefined">LinkedList</span> : <span class="swiftclass">CustomStringConvertible</span> {</span>
+<span class="swiftcode"></span>
+<span class="swiftcode">    <span class="swiftcomment">// STORED PROPERTIES</span></span>
+<span class="swiftcode"></span>
+<span class="swiftcode">    <span class="swiftkeyword">var</span> head: <span class="swiftdefined">Node</span>?  <span class="swiftcomment">// Reference to the head node</span></span>
+<span class="swiftcode">    <span class="swiftkeyword">var</span> tail: <span class="swiftdefined">Node</span>?  <span class="swiftcomment">// Reference to the tail node</span></span>
+<span class="swiftcode"></span>
+<span class="swiftcode">    <span class="swiftcomment">// COMPUTED PROPERTIES</span></span>
+<span class="swiftcode">    </span>
+<span class="swiftcode">    <span class="swiftcomment">/**</span></span>
+<span class="swiftcode"><span class="swiftcomment">    Checks if list is empty</span></span>
+<span class="swiftcode"><span class="swiftcomment">    </span></span>
+<span class="swiftcode"><span class="swiftcomment">    - returns: Bool True if list is empty, false otherwise.</span></span>
+<span class="swiftcode"><span class="swiftcomment">    */</span></span>
+<span class="swiftcode">    <span class="swiftkeyword">var</span> empty: <span class="swiftclass">Bool</span> {</span>
+<span class="swiftcode">        <span class="swiftkeyword">if</span> tail != nil {</span>
+<span class="swiftcode">            <span class="swiftkeyword">return</span> <span class="swiftkeyword">false</span></span>
+<span class="swiftcode">        } <span class="swiftkeyword">else</span> {</span>
+<span class="swiftcode">            <span class="swiftkeyword">return</span> <span class="swiftkeyword">true</span></span>
+<span class="swiftcode">        }</span>
+<span class="swiftcode">    }</span>
+<span class="swiftcode">    </span>
+<span class="swiftcode">    <span class="swiftcomment">/**</span></span>
+<span class="swiftcode"><span class="swiftcomment">    Counts the number of the items in the list</span></span>
+<span class="swiftcode"><span class="swiftcomment">    </span></span>
+<span class="swiftcode"><span class="swiftcomment">    - returns: Int Number of items in the list.</span></span>
+<span class="swiftcode"><span class="swiftcomment">    */</span></span>
+<span class="swiftcode">    <span class="swiftkeyword">var</span> count: <span class="swiftclass">Int</span> {</span>
+<span class="swiftcode">        </span>
+<span class="swiftcode">        <span class="swiftkeyword">var</span> nodeCount: <span class="swiftclass">Int</span> = <span class="swiftnumber">0</span> </span>
+<span class="swiftcode">        </span>
+<span class="swiftcode">        <span class="swiftcomment">//Starting with the head, walk</span></span>
+<span class="swiftcode">        <span class="swiftcomment">//through the list until the next</span></span>
+<span class="swiftcode">        <span class="swiftcomment">//node points to nil</span></span>
+<span class="swiftcode">        <span class="swiftkeyword">var</span> node: <span class="swiftdefined">Node</span>? = head;</span>
+<span class="swiftcode">        <span class="swiftkeyword">while</span> <span class="swiftkeyword">let</span> n = node {</span>
+<span class="swiftcode">            <span class="swiftcomment">//Count the node</span></span>
+<span class="swiftcode">            nodeCount += <span class="swiftnumber">1</span> </span>
+<span class="swiftcode">            <span class="swiftcomment">//Get the reference to the next node</span></span>
+<span class="swiftcode">            node = n.next</span>
+<span class="swiftcode">        }</span>
+<span class="swiftcode">        </span>
+<span class="swiftcode">        <span class="swiftkeyword">return</span> nodeCount</span>
+<span class="swiftcode">    }</span>
+<span class="swiftcode"></span>
+<span class="swiftcode">    <span class="swiftcomment">/**</span></span>
+<span class="swiftcode"><span class="swiftcomment">    String representation of the list</span></span>
+<span class="swiftcode"><span class="swiftcomment">    </span></span>
+<span class="swiftcode"><span class="swiftcomment">    - returns: String String representation of the list.</span></span>
+<span class="swiftcode"><span class="swiftcomment">    */</span></span>
+<span class="swiftcode">    <span class="swiftkeyword">var</span> description: <span class="swiftclass">String</span> {</span>
+<span class="swiftcode">        </span>
+<span class="swiftcode">        <span class="swiftcomment">//The beginning of the list is marked</span></span>
+<span class="swiftcode">        <span class="swiftcomment">//with the left-square bracket</span></span>
+<span class="swiftcode">        <span class="swiftkeyword">var</span> descStr: <span class="swiftclass">String</span> = <span class="swiftstring">"["</span></span>
+<span class="swiftcode"></span>
+<span class="swiftcode">        <span class="swiftcomment">//Walk through all the nodes and a string</span></span>
+<span class="swiftcode">        <span class="swiftcomment">//representation of each object's contents</span></span>
+<span class="swiftcode">        <span class="swiftcomment">//to descStr</span></span>
+<span class="swiftcode">        <span class="swiftkeyword">var</span> node: <span class="swiftdefined">Node</span>? = head</span>
+<span class="swiftcode">        <span class="swiftkeyword">while</span> <span class="swiftkeyword">let</span> n = node {</span>
+<span class="swiftcode">            descStr += <span class="swiftstring">"</span></span><span class="codeswift">\<span class="swiftstring">(</span>n.object<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span></span>
+<span class="swiftcode">            node = n.next</span>
+<span class="swiftcode">            <span class="swiftkeyword">if</span>(node != nil) {</span>
+<span class="swiftcode">                descStr += <span class="swiftstring">", "</span></span>
+<span class="swiftcode">            }</span>
+<span class="swiftcode">        }</span>
+<span class="swiftcode">        <span class="swiftcomment">//Close the description string</span></span>
+<span class="swiftcode">        <span class="swiftcomment">//with the right-square bracket</span></span>
+<span class="swiftcode">        descStr += <span class="swiftstring">"]"</span></span>
+<span class="swiftcode">        <span class="swiftkeyword">return</span> descStr</span>
+<span class="swiftcode">        </span>
+<span class="swiftcode">    }</span>
+<span class="swiftcode">    </span>
+<span class="swiftcode">    <span class="swiftcomment">// INITIALISERS</span></span>
+<span class="swiftcode">    </span>
+<span class="swiftcode">    <span class="swiftcomment">/**</span></span>
+<span class="swiftcode"><span class="swiftcomment">    Designated initialiser</span></span>
+<span class="swiftcode"><span class="swiftcomment"></span></span>
+<span class="swiftcode"><span class="swiftcomment">    - parameter list: Linked list to initialise with (nil by default)</span></span>
+<span class="swiftcode"><span class="swiftcomment">    */</span></span>
+<span class="swiftcode">    <span class="swiftkeyword">init</span>(list: <span class="swiftdefined">LinkedList</span>? = nil) {</span>
+<span class="swiftcode">        </span>
+<span class="swiftcode">        <span class="swiftcomment">//Set the list to empy</span></span>
+<span class="swiftcode">        <span class="swiftkeyword">self</span>.head = nil</span>
+<span class="swiftcode">        <span class="swiftkeyword">self</span>.tail = nil</span>
+<span class="swiftcode">        </span>
+<span class="swiftcode">        <span class="swiftcomment">//If argument is not nil, then</span></span>
+<span class="swiftcode">        <span class="swiftcomment">//add objects from that list to</span></span>
+<span class="swiftcode">        <span class="swiftcomment">//this one</span></span>
+<span class="swiftcode">        <span class="swiftkeyword">if</span> <span class="swiftkeyword">let</span> newList = list {</span>
+<span class="swiftcode">            <span class="swiftkeyword">var</span> node: <span class="swiftdefined">Node</span>? = newList.head</span>
+<span class="swiftcode">            <span class="swiftkeyword">while</span> <span class="swiftkeyword">let</span> n = node {</span>
+<span class="swiftcode">                <span class="swiftkeyword">self</span>.add(object: n.object)</span>
+<span class="swiftcode">                node = n.next</span>
+<span class="swiftcode">            }</span>
+<span class="swiftcode">        }</span>
+<span class="swiftcode">        </span>
+<span class="swiftcode">    }</span>
+<span class="swiftcode">    </span>
+<span class="swiftcode">    <span class="swiftcomment">// METHODS</span></span>
+<span class="swiftcode"></span>
+<span class="swiftcode">    <span class="swiftcomment">/**</span></span>
+<span class="swiftcode"><span class="swiftcomment">    Adds an object to the list</span></span>
+<span class="swiftcode"><span class="swiftcomment">    </span></span>
+<span class="swiftcode"><span class="swiftcomment">    - parameter object: Object to add to the list</span></span>
+<span class="swiftcode"><span class="swiftcomment">    */</span></span>
+<span class="swiftcode">    <span class="swiftkeyword">func</span> add(object: <span class="swiftclass">Any</span>) {</span>
+<span class="swiftcode">        <span class="swiftcomment">//Create a new node pointing to the</span></span>
+<span class="swiftcode">        <span class="swiftcomment">//object to be added</span></span>
+<span class="swiftcode">        <span class="swiftkeyword">let</span> node: <span class="swiftdefined">Node</span> = <span class="swiftdefined">Node</span>(object: object)</span>
+<span class="swiftcode">        </span>
+<span class="swiftcode">        <span class="swiftcomment">//Add the node to the list</span></span>
+<span class="swiftcode">        <span class="swiftkeyword">if</span> <span class="swiftkeyword">let</span> t = tail {</span>
+<span class="swiftcode">            <span class="swiftcomment">// If list is not empty, point its</span></span>
+<span class="swiftcode">            <span class="swiftcomment">// last node to the new node and</span></span>
+<span class="swiftcode">            <span class="swiftcomment">// point the tail to the new node</span></span>
+<span class="swiftcode">            t.next = node</span>
+<span class="swiftcode">            tail = node</span>
+<span class="swiftcode">        } <span class="swiftkeyword">else</span> {</span>
+<span class="swiftcode">            <span class="swiftcomment">// If list is empty, point the</span></span>
+<span class="swiftcode">            <span class="swiftcomment">// head and tail to the new node</span></span>
+<span class="swiftcode">            head = node</span>
+<span class="swiftcode">            tail = node</span>
+<span class="swiftcode">        }</span>
+<span class="swiftcode">    }</span>
+<span class="swiftcode">    </span>
+<span class="swiftcode">    <span class="swiftcomment">/**</span></span>
+<span class="swiftcode"><span class="swiftcomment">    Removes a node from list</span></span>
+<span class="swiftcode"><span class="swiftcomment"></span></span>
+<span class="swiftcode"><span class="swiftcomment">    - parameter node: Node to remove from the list</span></span>
+<span class="swiftcode"><span class="swiftcomment">    - returns: Bool True if node found in the list and removed,</span></span>
+<span class="swiftcode"><span class="swiftcomment">            false otherwise.</span></span>
+<span class="swiftcode"><span class="swiftcomment">    */</span></span>
+<span class="swiftcode">    <span class="swiftkeyword">func</span> remove(node: <span class="swiftdefined">Node</span>) -&gt; <span class="swiftclass">Bool</span> {</span>
+<span class="swiftcode">        </span>
+<span class="swiftcode">        <span class="swiftkeyword">var</span> nodeFound = <span class="swiftkeyword">false</span></span>
+<span class="swiftcode">        </span>
+<span class="swiftcode">        <span class="swiftcomment">//Find the node preceding the one</span></span>
+<span class="swiftcode">        <span class="swiftcomment">//to be removed - list is not double</span></span>
+<span class="swiftcode">        <span class="swiftcomment">//linked, so we need to walk through it</span></span>
+<span class="swiftcode">        <span class="swiftcomment">//form the head until we find the node</span></span>
+<span class="swiftcode">        <span class="swiftcomment">//with next link to the node to be removed</span></span>
+<span class="swiftcode">        <span class="swiftkeyword">var</span> prevNode: <span class="swiftdefined">Node</span>? = nil</span>
+<span class="swiftcode">        <span class="swiftkeyword">var</span> nextNode: <span class="swiftdefined">Node</span>? = head</span>
+<span class="swiftcode">        <span class="swiftkeyword">while</span> <span class="swiftkeyword">let</span> n = nextNode {</span>
+<span class="swiftcode">            <span class="swiftcomment">//Check if next node is the node</span></span>
+<span class="swiftcode">            <span class="swiftcomment">//to be removed...the === is an</span></span>
+<span class="swiftcode">            <span class="swiftcomment">//address comparison operator;</span></span>
+<span class="swiftcode">            <span class="swiftcomment">//the n is the unwrapped</span></span>
+<span class="swiftcode">            <span class="swiftcomment">//optional</span></span>
+<span class="swiftcode">            <span class="swiftkeyword">if</span>(n === node) {</span>
+<span class="swiftcode">                nodeFound = <span class="swiftkeyword">true</span></span>
+<span class="swiftcode">                <span class="swiftkeyword">break</span>;</span>
+<span class="swiftcode">            }</span>
+<span class="swiftcode">            prevNode = nextNode;</span>
+<span class="swiftcode">            nextNode = n.next</span>
+<span class="swiftcode">        }</span>
+<span class="swiftcode"></span>
+<span class="swiftcode">        </span>
+<span class="swiftcode">        <span class="swiftkeyword">if</span> nextNode !== node {</span>
+<span class="swiftcode">            prevNode = nil;</span>
+<span class="swiftcode">        }</span>
+<span class="swiftcode">        </span>
+<span class="swiftcode">        <span class="swiftcomment">// If node to be removed is</span></span>
+<span class="swiftcode">        <span class="swiftcomment">// the last one in the list,</span></span>
+<span class="swiftcode">        <span class="swiftcomment">// set tail to the previous node,</span></span>
+<span class="swiftcode">        <span class="swiftkeyword">if</span> tail === node {</span>
+<span class="swiftcode">            nodeFound = <span class="swiftkeyword">true</span></span>
+<span class="swiftcode">            <span class="swiftkeyword">if</span> <span class="swiftkeyword">let</span> n = prevNode {</span>
+<span class="swiftcode">                n.next = nil</span>
+<span class="swiftcode">            }</span>
+<span class="swiftcode">            tail = prevNode</span>
+<span class="swiftcode">            prevNode = nil</span>
+<span class="swiftcode">        }</span>
+<span class="swiftcode">        </span>
+<span class="swiftcode">        <span class="swiftcomment">// If the list is empty,</span></span>
+<span class="swiftcode">        <span class="swiftcomment">// set head to nil as well</span></span>
+<span class="swiftcode">        <span class="swiftkeyword">if</span> tail == nil {</span>
+<span class="swiftcode">            head = nil</span>
+<span class="swiftcode">        }</span>
+<span class="swiftcode">        </span>
+<span class="swiftcode">        <span class="swiftcomment">// If node to be removed is</span></span>
+<span class="swiftcode">        <span class="swiftcomment">// the first one in the list,</span></span>
+<span class="swiftcode">        <span class="swiftcomment">// set head to the next node</span></span>
+<span class="swiftcode">        <span class="swiftkeyword">if</span> head === node {</span>
+<span class="swiftcode">            nodeFound = <span class="swiftkeyword">true</span></span>
+<span class="swiftcode">            head = node.next</span>
+<span class="swiftcode">        }</span>
+<span class="swiftcode">        </span>
+<span class="swiftcode">        <span class="swiftcomment">// If head points to nil,</span></span>
+<span class="swiftcode">        <span class="swiftcomment">// then we have empty list</span></span>
+<span class="swiftcode">        <span class="swiftcomment">// and need to set tail accordingly</span></span>
+<span class="swiftcode">        <span class="swiftkeyword">if</span> head == nil {</span>
+<span class="swiftcode">            tail = nil</span>
+<span class="swiftcode">        }</span>
+<span class="swiftcode">        </span>
+<span class="swiftcode">        <span class="swiftcomment">// Relink the node preceeding</span></span>
+<span class="swiftcode">        <span class="swiftcomment">// the one that we are removing</span></span>
+<span class="swiftcode">        <span class="swiftcomment">// to the node following the one</span></span>
+<span class="swiftcode">        <span class="swiftcomment">// that we are removing</span></span>
+<span class="swiftcode">        <span class="swiftkeyword">if</span> <span class="swiftkeyword">let</span> n = prevNode {</span>
+<span class="swiftcode">            n.next = node.next</span>
+<span class="swiftcode">        }</span>
+<span class="swiftcode">        </span>
+<span class="swiftcode">        <span class="swiftkeyword">return</span> nodeFound</span>
+<span class="swiftcode">    }</span>
+<span class="swiftcode">    </span>
+<span class="swiftcode">    <span class="swiftcomment">/**</span></span>
+<span class="swiftcode"><span class="swiftcomment">    </span></span>
+<span class="swiftcode"><span class="swiftcomment">    Removes all objects from the list</span></span>
+<span class="swiftcode"><span class="swiftcomment"></span></span>
+<span class="swiftcode"><span class="swiftcomment">    */</span></span>
+<span class="swiftcode">    <span class="swiftkeyword">func</span> removeAll() {</span>
+<span class="swiftcode">        head = nil</span>
+<span class="swiftcode">        tail = nil</span>
+<span class="swiftcode">    }</span>
+<span class="swiftcode">    </span>
+<span class="swiftcode">    </span>
+<span class="swiftcode">    </span>
+<span class="swiftcode">}</span>
+</pre>
+</div>
+			
+		
+		<p>
+		<em>LinkedList.swift</em> implements two classes: <em><span class="swiftcode"><span class="swiftdefined">Node</span></span></em> and <em><span class="swiftcode"><span class="swiftdefined">LinkedList</span></span></em>.  A <em><span class="swiftcode"><span class="swiftdefined">Node</span></span></em> object is an object that contains two references—one to the contained object, the other to the next node in the list.  A <em><span class="swiftcode"><span class="swiftdefined">LinkedList</span></span></em> object contains references to the head and tail of the set of linked nodes.  The figure below shows a diagram of how it all fits together.  		</p>		
+		<img class="block" src="images/linkedlist.png" style="max-width:605px;" title="LinkedList internals">
+
+		<p>
+		A linked list is a data structure that links set of objects into a chain, which can be traversed through, from object to object, in one direction. The first and last objects are denoted as the head and tail of the list. When the list is empty, the head and tail point to <em><span class="swiftcode">nil</span></em>.		<p>
+		
+		<img class="block" src="images/list.png" style="max-width:711px;" title="Linked list">
+
+		<p>
+		The code is document, so you can look through the details of <em><span class="swiftcode"><span class="swiftdefined">LinkedList</span></span></em>'s implementation, but the class diagram (shown below) should provide sufficient information about the class: (Note that method name "addObject" should be "add" and "removeNode" should be "remove")
+		</p>
+		
+		<img class="block" src="images/cd_linkedlist.png" style="max-width:513px;" title="LinkedList class diagram">
+		
+		<p>
+		In the class diagram, each box represents a class.  The three sections within a box give the class name, its properties, and method signatures.  Properties that are objects point to the class diagram of their corresponding class.  In this case, <em><span class="swiftcode"><span class="swiftdefined">LinkedList</span></span></em> includes two variables of <em><span class="swiftcode"><span class="swiftdefined">Node</span>?</span></em> type (that is, <em><span class="swiftcode"><span class="swiftdefined">Node</span></span></em> wrapped in an optional).  The <em><span class="swiftcode"><span class="swiftdefined">Node</span></span></em> class has also a variable that points to a <em><span class="swiftcode"><span class="swiftdefined">Node</span>?</span></em> (an optional of the same type).  <em><span class="swiftcode"><span class="swiftdefined">LinkedList</span></span></em> uses <em><span class="swiftcode"><span class="swiftdefined">Node</span></span></em>s through composition—a list is not a node, but it has nodes.
+		</p>
+		
+		<p>
+		The class diagram above doesn't show initialisers.  If you take a look at the implementation of <em><span class="swiftcode"><span class="swiftdefined">LinkedList</span></span></em> you'll see that its initialiser is <em><span class="swiftcode"><span class="swiftkeyword">init</span>(list: <span class="swiftdefined">LinkedList</span>? = nil)</span></em>.  This initialiser has a parameter with a specified default value.  This means that it can be invoked without providing the parameter, in which case the default value of the parameter will be taken.  If the initialiser is provided with a parameter that is a <em><span class="swiftcode"><span class="swiftdefined">LinkedList</span></span></em>, it will make the new list as a copy of the one passed in.  The <em><span class="swiftcode">add</span></em> and <em><span class="swiftcode">remove</span></em> methods allows adding and removing items from the list. Addition puts the new object at the end of the list. When removing a node, the nodes preceding and following the one that is removed are relinked together.  
+		</p>
+		
+		<p>
+		To test the <em><span class="swiftcode"><span class="swiftdefined">LinkedList</span></span></em>, place the following code in <em>main.swift</em>:
+		</p>
+		
+		<div class="codeblock">
+<div class="codeblocktitle"><a href="code/01/main_01.swift">main.swift</a></div>
+<pre class="linenumbers unselectable" style="float: left;">01:
+02:
+03:
+04:
+05:
+06:
+07:
+08:
+09:
+10:
+11:
+12:
+13:
+14:
+15:
+</pre><pre class="code">
+<span class="swiftcode"><span class="swiftkeyword">import</span> Foundation</span>
+<span class="swiftcode"></span>
+<span class="swiftcode"><span class="swiftkeyword">let</span> str1: <span class="swiftclass">String</span> = <span class="swiftstring">"Item V"</span>;</span>
+<span class="swiftcode"><span class="swiftkeyword">let</span> str2: <span class="swiftclass">String</span> = <span class="swiftstring">"Item E"</span>;</span>
+<span class="swiftcode"><span class="swiftkeyword">let</span> str3: <span class="swiftclass">String</span> = <span class="swiftstring">"Item S"</span>;</span>
+<span class="swiftcode"><span class="swiftkeyword">let</span> str4: <span class="swiftclass">String</span> = <span class="swiftstring">"Item M"</span>;</span>
+<span class="swiftcode"></span>
+<span class="swiftcode"><span class="swiftkeyword">var</span> list: <span class="swiftdefined">LinkedList</span> = <span class="swiftdefined">LinkedList</span>()</span>
+<span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"</span></span><span class="codeswift">\<span class="swiftstring">(</span>list<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span>
+<span class="swiftcode"></span>
+<span class="swiftcode">list.add(object: str1)</span>
+<span class="swiftcode">list.add(object: str2)</span>
+<span class="swiftcode">list.add(object: str3)</span>
+<span class="swiftcode">list.add(object: str4)</span>
+<span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"</span></span><span class="codeswift">\<span class="swiftstring">(</span>list<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span>
+</pre>
+</div>
+		
+		
+		<p>
+		At first, this program creates an empty linked list and shows its contents—<em><span class="swiftcode"><span class="swiftdefined">LinkedList</span></span></em> is <em><span class="swiftcode">Printable</span></em>, so its description method will be invoked through interpolation. Since the <em><span class="swiftcode"><span class="swiftdefined">LinkedList</span></span></em> class refers to its elements with <em><span class="swiftcode"><span class="swiftclass">Any</span></span></em> type, it means that it can contain object references or values of any type.  In Swift, every type automatically type casts to <em><span class="swiftcode"><span class="swiftclass">Any</span></span></em>.  In the program above, the items added to the list are <em><span class="swiftcode"><span class="swiftclass">String</span></span></em>s.  Afterwards, the list is printed again.  Compile and run. You should get the following output in your Debug window:
+		</p>
+
+<pre class="output">[]
+[Item V, Item E, Item S, Item M]
+</pre>
+
+      <h3>Queue</h3>
+
+		<p>
+		Then next container you'll be adding to the SCL is the <em><span class="swiftcode"><span class="swiftdefined">Queue</span></span></em> class.  A queue is a first-in-first-out structure, where the order of objects removed from the queue follows the order of insertion. Queues are useful for buffering, where data can be stored for later processing.
+		</p>
+		
+		<img class="block" src="images/queue.png" style="max-width:625px;" title="Queue">
+		
+		<p>A queue can be seen as a linked list implementing the put and get methods: put inserts an object at the tail end of the list, get removes objects from the head of the list.  Hence, in SCL I, the <em><span class="swiftcode"><span class="swiftdefined">Queue</span></span></em> class will inherits from the <em><span class="swiftcode"><span class="swiftdefined">LinkedList</span></span></em>.
+		</p>
+		
+		<p>
+		Crate a new file in Xcode, name it <em>Queue.swift</em>, and fill it out with the following code (best to type it out this time):
+		</p>
+		
+		<div class="codeblock">
+<div class="codeblocktitle"><a href="code/01/Queue.swift">Queue.swift</a></div>
+<pre class="linenumbers unselectable" style="float: left;">01:
+02:
+03:
+04:
+05:
+06:
+07:
+08:
+09:
+10:
+11:
+12:
+13:
+14:
+15:
+16:
+17:
+18:
+19:
+20:
+21:
+22:
+23:
+24:
+25:
+26:
+27:
+28:
+29:
+30:
+31:
+32:
+33:
+34:
+35:
+36:
+37:
+38:
+39:
+40:
+41:
+42:
+43:
+44:
+45:
+46:
+47:
+48:
+</pre><pre class="code">
+<span class="swiftcode"><span class="swiftkeyword">import</span> Foundation</span>
+<span class="swiftcode"><span class="swiftcomment">/**</span></span>
+<span class="swiftcode"><span class="swiftcomment">A queue of objects</span></span>
+<span class="swiftcode"><span class="swiftcomment"></span></span>
+<span class="swiftcode"><span class="swiftcomment">*/</span></span>
+<span class="swiftcode"><span class="swiftkeyword">class</span> <span class="swiftdefined">Queue</span> : <span class="swiftdefined">LinkedList</span> {</span>
+<span class="swiftcode"></span>
+<span class="swiftcode">    <span class="swiftcomment">/**</span></span>
+<span class="swiftcode"><span class="swiftcomment">    Queue desription - adds a string indicating the</span></span>
+<span class="swiftcode"><span class="swiftcomment">    container is a queue before invoking super's description</span></span>
+<span class="swiftcode"><span class="swiftcomment">    </span></span>
+<span class="swiftcode"><span class="swiftcomment">    - returns: String String representation of the queue</span></span>
+<span class="swiftcode"><span class="swiftcomment">    */</span></span>
+<span class="swiftcode">    <span class="swiftkeyword">override</span> <span class="swiftkeyword">var</span> description: <span class="swiftclass">String</span> {</span>
+<span class="swiftcode">        <span class="swiftkeyword">return</span> <span class="swiftstring">"(Queue)&lt;--"</span>+<span class="swiftkeyword">super</span>.description+<span class="swiftstring">"&lt;--"</span></span>
+<span class="swiftcode">    }</span>
+<span class="swiftcode">    </span>
+<span class="swiftcode">    <span class="swiftcomment">/**</span></span>
+<span class="swiftcode"><span class="swiftcomment">    Puts an an object at the end of the queue</span></span>
+<span class="swiftcode"><span class="swiftcomment">    </span></span>
+<span class="swiftcode"><span class="swiftcomment">    - parameter object: Object to put in the queue.</span></span>
+<span class="swiftcode"><span class="swiftcomment">    */</span></span>
+<span class="swiftcode">    <span class="swiftkeyword">func</span> put(object: <span class="swiftclass">Any</span>) {</span>
+<span class="swiftcode">        <span class="swiftcomment">// Use inherited method to add object</span></span>
+<span class="swiftcode">        <span class="swiftcomment">// to the list</span></span>
+<span class="swiftcode">        <span class="swiftkeyword">self</span>.add(object: object);</span>
+<span class="swiftcode">    }</span>
+<span class="swiftcode">    </span>
+<span class="swiftcode">    <span class="swiftcomment">/**</span></span>
+<span class="swiftcode"><span class="swiftcomment">    Gets an an object from the start of the queue</span></span>
+<span class="swiftcode"><span class="swiftcomment">    </span></span>
+<span class="swiftcode"><span class="swiftcomment">    - returns: Any? Object removed from the start of the queue,</span></span>
+<span class="swiftcode"><span class="swiftcomment">                nil if queue is empy.</span></span>
+<span class="swiftcode"><span class="swiftcomment">    */</span></span>
+<span class="swiftcode">    <span class="swiftkeyword">func</span> <span class="swiftkeyword">get</span>() -&gt; <span class="swiftclass">Any</span>? {</span>
+<span class="swiftcode">        <span class="swiftcomment">// If head points to a non-nil node,</span></span>
+<span class="swiftcode">        <span class="swiftcomment">// remove that node and return its</span></span>
+<span class="swiftcode">        <span class="swiftcomment">// object</span></span>
+<span class="swiftcode">        <span class="swiftkeyword">if</span> <span class="swiftkeyword">let</span> n = head {</span>
+<span class="swiftcode">            <span class="swiftcomment">//Use inherited method to remove</span></span>
+<span class="swiftcode">            <span class="swiftcomment">//node from the list</span></span>
+<span class="swiftcode">            <span class="swiftkeyword">self</span>.remove(node: n)</span>
+<span class="swiftcode">            <span class="swiftkeyword">return</span> n.object</span>
+<span class="swiftcode">        } <span class="swiftkeyword">else</span> {</span>
+<span class="swiftcode">            <span class="swiftkeyword">return</span> nil</span>
+<span class="swiftcode">        }</span>
+<span class="swiftcode">    }</span>
+<span class="swiftcode">}</span>
+</pre>
+</div>
+			
+			
+		<p>
+		The <em><span class="swiftcode">put</span></em> method uses the inherited method <em><span class="swiftcode">add</span></em> to add an object to the end of itself. The <em><span class="swiftcode"><span class="swiftkeyword">get</span></span></em> method uses inherited method <em><span class="swiftcode">remove</span></em> to remove the node at the head of the list and return the object that node is referencing.
+		</p>
+		
+		<p>
+		The <em><span class="swiftcode"><span class="swiftdefined">Queue</span></span></em> class also overrides the <em><span class="swiftcode">description</span></em> method.  It still invokes its parent's <em><span class="swiftcode">description</span></em> by calling <em><span class="swiftcode"><span class="swiftkeyword">super</span>.description</span></em>, but the string returned by the superclass is wrapped in a string indicating that the new container is a queue.  The wrapping string also indicates the insert and remove ends of the queue (with the arrows) where the objects enter and exit the list. 
+		</p>
+		
+		<p>The class diagram for the <em><span class="swiftcode"><span class="swiftdefined">Queue</span></span></em> is shown below.</p>
+		
+		<img class="block" src="images/cd_queue.png" style="max-width:523px;" title="Queue class diagram">
+		
+		<p>
+		 Notice that <em><span class="swiftcode"><span class="swiftdefined">Queue</span></span></em> responds to all the methods that <em><span class="swiftcode"><span class="swiftdefined">LinkedList</span></span></em> does—that's the nature of inheritance.  Visibility of the inherited methods can be controlled to certain degree with Access Control, but in this lab all the methods will carry the implicit privacy setting, which corresponds to <em><span class="swiftcode"><span class="swiftkeyword">internal</span></span></em> access. 
+		</p> 
+		
+				
+		<p>
+		Add the following code to <em>main.swift</em> to test the new container:
+		</p>
+		
+		<div class="codeblock">
+<div class="codeblocktitle"><a href="code/01/main_02.swift">main.swift</a></div>
+<pre class="linenumbers unselectable" style="float: left;"><span class="codeold">01:
+</span><span class="codeold">02:
+</span><span class="codeold">03:
+</span><span class="codeold">04:
+</span><span class="codeold">05:
+</span><span class="codeold">06:
+</span><span class="codeold">07:
+</span><span class="codeold">08:
+</span><span class="codeold">09:
+</span><span class="codeold">10:
+</span><span class="codeold">11:
+</span><span class="codeold">12:
+</span><span class="codeold">13:
+</span><span class="codeold">14:
+</span><span class="codeold">15:
+</span><span class="codeold">16:
+</span>17:
+18:
+19:
+20:
+21:
+22:
+23:
+24:
+25:
+26:
+27:
+</pre><pre class="code">
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">import</span> Foundation</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">let</span> str1: <span class="swiftclass">String</span> = <span class="swiftstring">"Item V"</span>;</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">let</span> str2: <span class="swiftclass">String</span> = <span class="swiftstring">"Item E"</span>;</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">let</span> str3: <span class="swiftclass">String</span> = <span class="swiftstring">"Item S"</span>;</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">let</span> str4: <span class="swiftclass">String</span> = <span class="swiftstring">"Item M"</span>;</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">var</span> list: <span class="swiftdefined">LinkedList</span> = <span class="swiftdefined">LinkedList</span>()</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"</span></span><span class="codeswift">\<span class="swiftstring">(</span>list<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="codeold"><span class="swiftcode">list.add(object: str1)</span></span>
+<span class="codeold"><span class="swiftcode">list.add(object: str2)</span></span>
+<span class="codeold"><span class="swiftcode">list.add(object: str3)</span></span>
+<span class="codeold"><span class="swiftcode">list.add(object: str4)</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"</span></span><span class="codeswift">\<span class="swiftstring">(</span>list<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="swiftcode"><span class="swiftkeyword">var</span> queue: <span class="swiftdefined">Queue</span> = <span class="swiftdefined">Queue</span>(list: list)</span>
+<span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"\n</span></span><span class="codeswift">\<span class="swiftstring">(</span>queue<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span>
+<span class="swiftcode"></span>
+<span class="swiftcode"><span class="swiftkeyword">if</span> <span class="swiftkeyword">let</span> item1 = queue.<span class="swiftkeyword">get</span>() {</span>
+<span class="swiftcode">    <span class="swiftfunction">print</span>(<span class="swiftstring">"Got item: </span></span><span class="codeswift">\<span class="swiftstring">(</span>item1 <span class="swiftkeyword">as</span>! <span class="swiftclass">String</span><span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span>
+<span class="swiftcode">}</span>
+<span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"</span></span><span class="codeswift">\<span class="swiftstring">(</span>queue<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span>
+<span class="swiftcode"></span>
+<span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"Putting item: </span></span><span class="codeswift">\<span class="swiftstring">(</span>str2<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span>
+<span class="swiftcode">queue.put(object: str2)</span>
+<span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"</span></span><span class="codeswift">\<span class="swiftstring">(</span>queue<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span>
+</pre>
+</div>
+		
+		
+		<p>
+		Notice that the above program uses initialisation method inherited from <em><span class="swiftcode"><span class="swiftdefined">LinkedList</span></span></em>, passing an existing list into the new <em><span class="swiftcode"><span class="swiftdefined">Queue</span></span></em> instance.  Hence, the first print out of the queue contents is the same as the contents of that list.  Also note the forced casting of <em><span class="swiftcode">item1</span></em>.  The type of variable <em><span class="swiftcode">item1</span></em> is inferred to be <em><span class="swiftcode"><span class="swiftclass">Any</span></span></em>, because that's the type that the <em><span class="swiftcode"><span class="swiftkeyword">get</span>()</span></em> method returns.  However, this object is definitely a <em><span class="swiftcode"><span class="swiftclass">String</span></span></em>, because the list has been populated only with <em><span class="swiftcode"><span class="swiftclass">String</span></span></em>s.
+		</p>
+		
+		<p>
+		Compile and run. You should get additional output that looks as follows:
+		</p>
+
+<pre class="output">
+(Queue)<--[Item V, Item E, Item S, Item M]<--
+Got item: Item V
+(Queue)<--[Item E, Item S, Item M]<--
+Putting item: Item E
+(Queue)<--[Item E, Item S, Item M, Item E]<--
+</pre>	
+
+		
+	  <h3>Stack</h3>
+
+		<img class="block" src="images/stack.png" style="max-width:243px; float: right" title="Stack">
+	
+		<p>
+		Next container you'll be implementing is a stack.  A stack is a last-in-first-out data structure, where the order of insertion is reversed when removing objects from the structure. A stack can be seen as a linked list implementing push and pop methods: push inserts objects at list's tail, pop removes objects at the tail. Stacks mirror constraints present in many real world problems, and therefore are quite useful as programming abstractions. For instance, think of a line of cars parked on a narrow driveway—the last person to park must move their car before others can leave.		</p>
+		
+		<p>This time you have to implement the class yourself.  Create a new file <em>Stack.swift</em> in your Xcode project and implement the <em><span class="swiftcode"><span class="swiftdefined">Stack</span></span></em> class so that its interface conforms to the class diagram below.  Remember, you don't need to implement the inherited methods.  Model your new methods on <em><span class="swiftcode"><span class="swiftdefined">Queue</span></span></em> class—there's very little that needs to change in order to have it behave like a stack.  
+		</p>
+		
+		<img class="block" src="images/cd_stack.png" style="max-width:494px; clear: both" title="Stack class diagram">
+
+		<p>
+		Once you're satisfied with your implementation, add the following code to <em>main.swift</em>:
+		</p>
+		
+		<div class="codeblock">
+<div class="codeblocktitle"><a href="code/01/main_03.swift">main.swift</a></div>
+<pre class="linenumbers unselectable" style="float: left;"><span class="codeold">01:
+</span><span class="codeold">02:
+</span><span class="codeold">03:
+</span><span class="codeold">04:
+</span><span class="codeold">05:
+</span><span class="codeold">06:
+</span><span class="codeold">07:
+</span><span class="codeold">08:
+</span><span class="codeold">09:
+</span><span class="codeold">10:
+</span><span class="codeold">11:
+</span><span class="codeold">12:
+</span><span class="codeold">13:
+</span><span class="codeold">14:
+</span><span class="codeold">15:
+</span><span class="codeold">16:
+</span><span class="codeold">17:
+</span><span class="codeold">18:
+</span><span class="codeold">19:
+</span><span class="codeold">20:
+</span><span class="codeold">21:
+</span><span class="codeold">22:
+</span><span class="codeold">23:
+</span><span class="codeold">24:
+</span><span class="codeold">25:
+</span><span class="codeold">26:
+</span><span class="codeold">27:
+</span><span class="codeold">28:
+</span>29:
+30:
+31:
+32:
+33:
+34:
+35:
+36:
+37:
+38:
+39:
+</pre><pre class="code">
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">import</span> Foundation</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">let</span> str1: <span class="swiftclass">String</span> = <span class="swiftstring">"Item V"</span>;</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">let</span> str2: <span class="swiftclass">String</span> = <span class="swiftstring">"Item E"</span>;</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">let</span> str3: <span class="swiftclass">String</span> = <span class="swiftstring">"Item S"</span>;</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">let</span> str4: <span class="swiftclass">String</span> = <span class="swiftstring">"Item M"</span>;</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">var</span> list: <span class="swiftdefined">LinkedList</span> = <span class="swiftdefined">LinkedList</span>()</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"</span></span><span class="codeswift">\<span class="swiftstring">(</span>list<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="codeold"><span class="swiftcode">list.add(object: str1)</span></span>
+<span class="codeold"><span class="swiftcode">list.add(object: str2)</span></span>
+<span class="codeold"><span class="swiftcode">list.add(object: str3)</span></span>
+<span class="codeold"><span class="swiftcode">list.add(object: str4)</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"</span></span><span class="codeswift">\<span class="swiftstring">(</span>list<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">var</span> queue: <span class="swiftdefined">Queue</span> = <span class="swiftdefined">Queue</span>(list: list)</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"\n</span></span><span class="codeswift">\<span class="swiftstring">(</span>queue<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">if</span> <span class="swiftkeyword">let</span> item1 = queue.<span class="swiftkeyword">get</span>() {</span></span>
+<span class="codeold"><span class="swiftcode">    <span class="swiftfunction">print</span>(<span class="swiftstring">"Got item: </span></span><span class="codeswift">\<span class="swiftstring">(</span>item1 <span class="swiftkeyword">as</span>! <span class="swiftclass">String</span><span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode">}</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"</span></span><span class="codeswift">\<span class="swiftstring">(</span>queue<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"Putting item: </span></span><span class="codeswift">\<span class="swiftstring">(</span>str2<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode">queue.put(object: str2)</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"</span></span><span class="codeswift">\<span class="swiftstring">(</span>queue<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="swiftcode"><span class="swiftkeyword">var</span> stack: <span class="swiftdefined">Stack</span> = <span class="swiftdefined">Stack</span>(list: list)</span>
+<span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"\n</span></span><span class="codeswift">\<span class="swiftstring">(</span>stack<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span>
+<span class="swiftcode"></span>
+<span class="swiftcode"><span class="swiftkeyword">if</span> <span class="swiftkeyword">let</span> item2 = stack.pop() {</span>
+<span class="swiftcode">    <span class="swiftfunction">print</span>(<span class="swiftstring">"Popped item: </span></span><span class="codeswift">\<span class="swiftstring">(</span>item2 <span class="swiftkeyword">as</span>! <span class="swiftclass">String</span><span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span>
+<span class="swiftcode">}</span>
+<span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"</span></span><span class="codeswift">\<span class="swiftstring">(</span>stack<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span>
+<span class="swiftcode"></span>
+<span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"Pushing item: </span></span><span class="codeswift">\<span class="swiftstring">(</span>str2<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span>
+<span class="swiftcode">stack.push(object: str2)</span>
+<span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"</span></span><span class="codeswift">\<span class="swiftstring">(</span>stack<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span>
+</pre>
+</div>
+	
+		
+		<p>Run and check for the following additional output:</p>
+
+<pre class="output">
+(Stack)[Item V, Item E, Item S, Item M]<-->
+Popped item: Item M
+(Stack)[Item V, Item E, Item S]<-->
+Pushing item: Item E
+(Stack)[Item V, Item E, Item S, Item E]<-->
+</pre>	
+
+		<p>Is your output the same?  No?  Is it perhaps because you didn't override the <em><span class="swiftcode">description</span></em> method, or you did it in a different way?  As long as the stack contents are correct, you can leave your version of the <em><span class="swiftcode">descrition</span></em> method.  If you'd like to make it look like the one above, you should be able to deduce how it works from the print out above.  
+		</p>
+
+	  <h3>Array</h3>
+	
+		<p>
+		An array associates index numbers with objects it contains. This makes it easy to access any object in the list (by providing its index), reading and writing from/to an arbitrary position. In SCL I, an array is going to be a linked list with enumerated items.  This is going to be rather inefficient implementation of an array, but the point of this exercise is to practice inheritance.
+		</p>
+		
+		<img class="block" src="images/array.png" style="max-width:497px;" title="Array">
+			
+		<p>
+		To implement the <em><span class="swiftcode"><span class="swiftdefined">Array</span></span></em> class, you'l need first the <em><span class="swiftcode"><span class="swiftdefined">SortableList</span></span></em> class, from which <em><span class="swiftcode"><span class="swiftdefined">Array</span></span></em> will inherit.  Download the following file and add it to your project:
+		</p>
+		
+		<div class="codeblock">
+<div class="codeblocktitle"><a href="code/01/SortableList.swift">SortableList.swift</a></div>
+<pre class="linenumbers unselectable" style="float: left;">001:
+002:
+003:
+004:
+005:
+006:
+007:
+008:
+009:
+010:
+011:
+012:
+013:
+014:
+015:
+016:
+017:
+018:
+019:
+020:
+021:
+022:
+023:
+024:
+025:
+026:
+027:
+028:
+029:
+030:
+031:
+032:
+033:
+034:
+035:
+036:
+037:
+038:
+039:
+040:
+041:
+042:
+043:
+044:
+045:
+046:
+047:
+048:
+049:
+050:
+051:
+052:
+053:
+054:
+055:
+056:
+057:
+058:
+059:
+060:
+061:
+062:
+063:
+064:
+065:
+066:
+067:
+068:
+069:
+070:
+071:
+072:
+073:
+074:
+075:
+076:
+077:
+078:
+079:
+080:
+081:
+082:
+083:
+084:
+085:
+086:
+087:
+088:
+089:
+090:
+091:
+092:
+</pre><pre class="code">
+<span class="swiftcode"><span class="swiftcomment">/**</span></span>
+<span class="swiftcode"><span class="swiftcomment">Extending the node class to provide it with a method</span></span>
+<span class="swiftcode"><span class="swiftcomment">for swapping objects between nodes</span></span>
+<span class="swiftcode"><span class="swiftcomment">*/</span></span>
+<span class="swiftcode"><span class="swiftkeyword">extension</span> <span class="swiftdefined">Node</span> {</span>
+<span class="swiftcode">    </span>
+<span class="swiftcode">    <span class="swiftcomment">/**</span></span>
+<span class="swiftcode"><span class="swiftcomment">    Swaps objects between self and another node nodes - useful for</span></span>
+<span class="swiftcode"><span class="swiftcomment">    sorting - instead of swapping and relinking the nodes, it's easier</span></span>
+<span class="swiftcode"><span class="swiftcomment">    to leave the nodes where they are, and just swap their</span></span>
+<span class="swiftcode"><span class="swiftcomment">    objects</span></span>
+<span class="swiftcode"><span class="swiftcomment">    </span></span>
+<span class="swiftcode"><span class="swiftcomment">    - parameter n Node to swap objects with</span></span>
+<span class="swiftcode"><span class="swiftcomment">    */</span></span>
+<span class="swiftcode">    <span class="swiftkeyword">func</span> swapObjectsWith(n: <span class="swiftdefined">Node</span>) {</span>
+<span class="swiftcode">        <span class="swiftkeyword">let</span> temp: <span class="swiftclass">Any</span> = <span class="swiftkeyword">self</span>.object</span>
+<span class="swiftcode">        <span class="swiftkeyword">self</span>.object = n.object</span>
+<span class="swiftcode">        n.object = temp</span>
+<span class="swiftcode">    }</span>
+<span class="swiftcode">}</span>
+<span class="swiftcode"></span>
+<span class="swiftcode"></span>
+<span class="swiftcode"><span class="swiftkeyword">class</span> <span class="swiftdefined">SortableList</span> : <span class="swiftdefined">LinkedList</span> {</span>
+<span class="swiftcode">    </span>
+<span class="swiftcode">    <span class="swiftcomment">/**</span></span>
+<span class="swiftcode"><span class="swiftcomment">    Get the Nth node from the LinkedList</span></span>
+<span class="swiftcode"><span class="swiftcomment">    </span></span>
+<span class="swiftcode"><span class="swiftcomment">    - parameter index: Index of the node to Get</span></span>
+<span class="swiftcode"><span class="swiftcomment">    - returns: Node? The node at the specified index, or nil</span></span>
+<span class="swiftcode"><span class="swiftcomment">    if index exceeds list count</span></span>
+<span class="swiftcode"><span class="swiftcomment">    */</span></span>
+<span class="swiftcode">    <span class="swiftkeyword">func</span> getNodeAtIndex(index: <span class="swiftclass">Int</span>) -&gt; <span class="swiftdefined">Node</span>? {</span>
+<span class="swiftcode">        <span class="swiftkeyword">var</span> node: <span class="swiftdefined">Node</span>? = head;</span>
+<span class="swiftcode">        <span class="swiftcomment">// Walk through the list until the</span></span>
+<span class="swiftcode">        <span class="swiftcomment">// specified index</span></span>
+<span class="swiftcode">        <span class="swiftkeyword">if</span> index &gt; <span class="swiftnumber">0</span> {</span>
+<span class="swiftcode">            <span class="swiftkeyword">for</span> _ <span class="swiftkeyword">in</span> <span class="swiftnumber">1</span>...index {</span>
+<span class="swiftcode">                <span class="swiftkeyword">if</span> <span class="swiftkeyword">let</span> n = node {</span>
+<span class="swiftcode">                    node = n.next;</span>
+<span class="swiftcode">                } <span class="swiftkeyword">else</span> {</span>
+<span class="swiftcode">                    <span class="swiftcomment">// Exit early if index</span></span>
+<span class="swiftcode">                    <span class="swiftcomment">// exceeds number of</span></span>
+<span class="swiftcode">                    <span class="swiftcomment">// items on the list</span></span>
+<span class="swiftcode">                    <span class="swiftkeyword">return</span> nil;</span>
+<span class="swiftcode">                }</span>
+<span class="swiftcode">            }</span>
+<span class="swiftcode">        }</span>
+<span class="swiftcode">        <span class="swiftkeyword">return</span> node;</span>
+<span class="swiftcode">    }</span>
+<span class="swiftcode">    </span>
+<span class="swiftcode">    <span class="swiftcomment">/**</span></span>
+<span class="swiftcode"><span class="swiftcomment">    Sort the list using the provided compare function</span></span>
+<span class="swiftcode"><span class="swiftcomment">    </span></span>
+<span class="swiftcode"><span class="swiftcomment">    - parameter isObject: A function that compares two objects and</span></span>
+<span class="swiftcode"><span class="swiftcomment">    returns true if the first one is smaller than the second one</span></span>
+<span class="swiftcode"><span class="swiftcomment">    </span></span>
+<span class="swiftcode"><span class="swiftcomment">    */</span></span>
+<span class="swiftcode">    <span class="swiftkeyword">func</span> sort(isObject: (<span class="swiftclass">Any</span>, <span class="swiftclass">Any</span>) -&gt; <span class="swiftclass">Bool</span>) {</span>
+<span class="swiftcode">        </span>
+<span class="swiftcode">        <span class="swiftkeyword">while</span> <span class="swiftkeyword">true</span> {</span>
+<span class="swiftcode">            <span class="swiftkeyword">var</span> swap: <span class="swiftclass">Bool</span> = <span class="swiftkeyword">false</span>;</span>
+<span class="swiftcode">            </span>
+<span class="swiftcode">            <span class="swiftkeyword">var</span> nodeLeft: <span class="swiftdefined">Node</span>? = head</span>
+<span class="swiftcode">            </span>
+<span class="swiftcode">            <span class="swiftcomment">// Walk through the nodes in the list</span></span>
+<span class="swiftcode">            <span class="swiftkeyword">while</span> <span class="swiftkeyword">let</span> nLeft = nodeLeft  {</span>
+<span class="swiftcode">                <span class="swiftcomment">// Get the next node in the list</span></span>
+<span class="swiftcode">                <span class="swiftkeyword">if</span> <span class="swiftkeyword">let</span> nRight = nLeft.next {</span>
+<span class="swiftcode">                    <span class="swiftcomment">// Invoked the function that got passed</span></span>
+<span class="swiftcode">                    <span class="swiftcomment">// in as a parameter to check if the</span></span>
+<span class="swiftcode">                    <span class="swiftcomment">// object that follows the current one</span></span>
+<span class="swiftcode">                    <span class="swiftcomment">// on the list is smaller - if yes,</span></span>
+<span class="swiftcode">                    <span class="swiftcomment">// then swap the object of the two nodes</span></span>
+<span class="swiftcode">                    <span class="swiftkeyword">if</span>(isObject(nRight.object, nLeft.object)) {</span>
+<span class="swiftcode">                        nLeft.swapObjectsWith(n: nRight)</span>
+<span class="swiftcode">                        swap = <span class="swiftkeyword">true</span></span>
+<span class="swiftcode">                    }</span>
+<span class="swiftcode">                }</span>
+<span class="swiftcode">                nodeLeft = nLeft.next</span>
+<span class="swiftcode">            }</span>
+<span class="swiftcode">            </span>
+<span class="swiftcode">            <span class="swiftcomment">// Check if anything got swapped in this</span></span>
+<span class="swiftcode">            <span class="swiftcomment">// pass through the entire list - if not,</span></span>
+<span class="swiftcode">            <span class="swiftcomment">// then the entire list has been completely</span></span>
+<span class="swiftcode">            <span class="swiftcomment">// sorted</span></span>
+<span class="swiftcode">            <span class="swiftkeyword">if</span> !swap {</span>
+<span class="swiftcode">                <span class="swiftkeyword">break</span>;</span>
+<span class="swiftcode">            }</span>
+<span class="swiftcode">        }</span>
+<span class="swiftcode">    }</span>
+<span class="swiftcode">    </span>
+<span class="swiftcode">}</span>
+</pre>
+</div>
+	
+
+		<p>
+		The first thing you'll notice in <em>SortableList.swift</em> is the extension of the <em><span class="swiftcode"><span class="swiftdefined">Node</span></span></em> class.  Extension is like a continuation of implementation of a given class; it allows you to add new methods.  In this case, a method has been added to <em><span class="swiftcode"><span class="swiftdefined">Node</span></span></em> that performs object swap with another node.  This method will be useful for sorting.  Extensions are a good alternative to inheritance when a bit of extra functionality is needed from a class, but not so much to justify creation of a new subclass.
+		</p>  
+
+		<p>
+		<em><span class="swiftcode"><span class="swiftdefined">SortableList</span></span></em> inherits from <em><span class="swiftcode"><span class="swiftdefined">LinkedList</span></span></em> and implements three methods: one for fetching a node at given index in the the list, and another for sorting.  The argument of the <em><span class="swiftcode">sort</span></em> method is a function—in Swift you can pass in a function as a parameter into another function/method.  In this case, the <em><span class="swiftcode">isObject</span></em> parameter is a function with signature <em><span class="swiftcode">(<span class="swiftclass">Any</span>, <span class="swiftclass">Any</span>) -&gt; <span class="swiftclass">Bool</span></span></em>, and is meant to provide code for comparing two items on the list.  It does not always make sense to compare objects, and even when it does, it's not always apparent what does it mean for one instance of a given class to be bigger/smaller than another instance of another class.  Hence, the sorting method requires the programmer, who invokes the method, to provide the code that does the comparison.  That code is invoked in the second <em><span class="swiftcode"><span class="swiftkeyword">if</span></span></em> statement of the sort method, followed by a call to <em><span class="swiftcode"><span class="swiftdefined">Node</span></span></em>'s newly extended <em><span class="swiftcode">swapObjectWith</span></em> method.  
+		</p> 
+		
+		<p>
+		The class diagram for <em><span class="swiftcode"><span class="swiftdefined">SortableList</span></span></em> is shown below (note the new method in the extended <em><span class="swiftcode"><span class="swiftdefined">Node</span></span></em> class).
+		</p>
+		
+		<img class="block" src="images/cd_sortablelist.png" style="max-width:534px;" title="SortableList class diagram">
+		
+		<p>
+		Create a new file in you project and name it <em>Array.swift</em>.  Implement the <em><span class="swiftcode"><span class="swiftdefined">Array</span></span></em> class that inherits from <em><span class="swiftcode"><span class="swiftdefined">SortableList</span></span></em> and conforms to the interface of the class diagram below.
+		</p>
+		
+		<img class="block" src="images/cd_array.png" style="max-width:611px;" title="Array class diagram">
+					
+		<p>
+		The <em><span class="swiftcode"><span class="swiftkeyword">get</span>(index: <span class="swiftclass">Int</span>) -&gt; <span class="swiftclass">Any</span></span></em> method should return object at specified index, and the <em><span class="swiftcode"><span class="swiftkeyword">set</span>(object: <span class="swiftclass">Any</span>, at: <span class="swiftclass">Int</span>)</span></em> method should place the new object at given index.  In both cases, if the index exceed the size of the array, an assert should be triggered.  This means that array can be extended only by using the inherited <em><span class="swiftcode">add(object: <span class="swiftclass">Any</span>)</span></em> method.  If you're not sure how to go about implementing the new methods, here's a hint—the <em><span class="swiftcode">getNodeAtIndex</span></em> method, inherited from <em><span class="swiftcode"><span class="swiftdefined">SortableList</span></span></em>, should be very useful.
+		</p>
+
+		<p>
+		Once you're finished with your implementation, add the following code to <em>main.swift</em>:
+		</p>
+		
+		<div class="codeblock">
+<div class="codeblocktitle"><a href="code/01/main_04.swift">main.swift</a></div>
+<pre class="linenumbers unselectable" style="float: left;"><span class="codeold">01:
+</span><span class="codeold">02:
+</span><span class="codeold">03:
+</span><span class="codeold">04:
+</span><span class="codeold">05:
+</span><span class="codeold">06:
+</span><span class="codeold">07:
+</span><span class="codeold">08:
+</span><span class="codeold">09:
+</span><span class="codeold">10:
+</span><span class="codeold">11:
+</span><span class="codeold">12:
+</span><span class="codeold">13:
+</span><span class="codeold">14:
+</span><span class="codeold">15:
+</span><span class="codeold">16:
+</span><span class="codeold">17:
+</span><span class="codeold">18:
+</span><span class="codeold">19:
+</span><span class="codeold">20:
+</span><span class="codeold">21:
+</span><span class="codeold">22:
+</span><span class="codeold">23:
+</span><span class="codeold">24:
+</span><span class="codeold">25:
+</span><span class="codeold">26:
+</span><span class="codeold">27:
+</span><span class="codeold">28:
+</span><span class="codeold">29:
+</span><span class="codeold">30:
+</span><span class="codeold">31:
+</span><span class="codeold">32:
+</span><span class="codeold">33:
+</span><span class="codeold">34:
+</span><span class="codeold">35:
+</span><span class="codeold">36:
+</span><span class="codeold">37:
+</span><span class="codeold">38:
+</span><span class="codeold">39:
+</span><span class="codeold">40:
+</span>41:
+42:
+43:
+44:
+45:
+46:
+47:
+48:
+49:
+50:
+51:
+52:
+</pre><pre class="code">
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">import</span> Foundation</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">let</span> str1: <span class="swiftclass">String</span> = <span class="swiftstring">"Item V"</span>;</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">let</span> str2: <span class="swiftclass">String</span> = <span class="swiftstring">"Item E"</span>;</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">let</span> str3: <span class="swiftclass">String</span> = <span class="swiftstring">"Item S"</span>;</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">let</span> str4: <span class="swiftclass">String</span> = <span class="swiftstring">"Item M"</span>;</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">var</span> list: <span class="swiftdefined">LinkedList</span> = <span class="swiftdefined">LinkedList</span>()</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"</span></span><span class="codeswift">\<span class="swiftstring">(</span>list<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="codeold"><span class="swiftcode">list.add(object: str1)</span></span>
+<span class="codeold"><span class="swiftcode">list.add(object: str2)</span></span>
+<span class="codeold"><span class="swiftcode">list.add(object: str3)</span></span>
+<span class="codeold"><span class="swiftcode">list.add(object: str4)</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"</span></span><span class="codeswift">\<span class="swiftstring">(</span>list<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">var</span> queue: <span class="swiftdefined">Queue</span> = <span class="swiftdefined">Queue</span>(list: list)</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"\n</span></span><span class="codeswift">\<span class="swiftstring">(</span>queue<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">if</span> <span class="swiftkeyword">let</span> item1 = queue.<span class="swiftkeyword">get</span>() {</span></span>
+<span class="codeold"><span class="swiftcode">    <span class="swiftfunction">print</span>(<span class="swiftstring">"Got item: </span></span><span class="codeswift">\<span class="swiftstring">(</span>item1 <span class="swiftkeyword">as</span>! <span class="swiftclass">String</span><span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode">}</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"</span></span><span class="codeswift">\<span class="swiftstring">(</span>queue<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"Putting item: </span></span><span class="codeswift">\<span class="swiftstring">(</span>str2<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode">queue.put(object: str2)</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"</span></span><span class="codeswift">\<span class="swiftstring">(</span>queue<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">var</span> stack: <span class="swiftdefined">Stack</span> = <span class="swiftdefined">Stack</span>(list: list)</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"\n</span></span><span class="codeswift">\<span class="swiftstring">(</span>stack<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">if</span> <span class="swiftkeyword">let</span> item2 = stack.pop() {</span></span>
+<span class="codeold"><span class="swiftcode">    <span class="swiftfunction">print</span>(<span class="swiftstring">"Popped item: </span></span><span class="codeswift">\<span class="swiftstring">(</span>item2 <span class="swiftkeyword">as</span>! <span class="swiftclass">String</span><span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode">}</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"</span></span><span class="codeswift">\<span class="swiftstring">(</span>stack<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"Pushing item: </span></span><span class="codeswift">\<span class="swiftstring">(</span>str2<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode">stack.push(object: str2)</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"</span></span><span class="codeswift">\<span class="swiftstring">(</span>stack<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="swiftcode"><span class="swiftkeyword">var</span> array: <span class="swiftdefined">Array</span> = <span class="swiftdefined">Array</span>(list: list)</span>
+<span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"\n</span></span><span class="codeswift">\<span class="swiftstring">(</span>array<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span>
+<span class="swiftcode"></span>
+<span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"Setting array[2] to </span></span><span class="codeswift">\<span class="swiftstring">(</span>str1<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span>
+<span class="swiftcode">array.<span class="swiftkeyword">set</span>(object: str1, at: <span class="swiftnumber">2</span>)</span>
+<span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"</span></span><span class="codeswift">\<span class="swiftstring">(</span>array<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span>
+<span class="swiftcode"></span>
+<span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"Sorting array"</span>);</span>
+<span class="swiftcode">array.sort(isObject: { o1, o2 <span class="swiftkeyword">in</span> (o1 <span class="swiftkeyword">as</span>! <span class="swiftclass">String</span>) &lt; (o2 <span class="swiftkeyword">as</span>! <span class="swiftclass">String</span>) })</span>
+<span class="swiftcode"><span class="swiftkeyword">for</span> index <span class="swiftkeyword">in</span> <span class="swiftnumber">0</span>..&lt;array.count {</span>
+<span class="swiftcode">    <span class="swiftfunction">print</span>(<span class="swiftstring">"array[</span></span><span class="codeswift">\<span class="swiftstring">(</span>index<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">]=</span></span><span class="codeswift">\<span class="swiftstring">(</span>array.<span class="swiftkeyword">get</span>(index: index)<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span>
+<span class="swiftcode">}</span>
+</pre>
+</div>
+	
+		
+		<p>
+		Note the parameter that is passed in to array's sort method: "<em><span class="swiftcode">{ o1, o2 <span class="swiftkeyword">in</span> (o1 <span class="swiftkeyword">as</span>! <span class="swiftclass">String</span>) &lt; (o2 <span class="swiftkeyword">as</span>! <span class="swiftclass">String</span>) }</span></em>"—that's the block of code that compares two objects from the list.  This block of code is called a closure, and the syntax given above is a short-hand syntax that implements anonymous function of signature "<em><span class="swiftcode">(<span class="swiftclass">Any</span>, <span class="swiftclass">Any</span>) -&gt; <span class="swiftclass">Bool</span></span></em>".  This signature matches the signature of the isObject argument of <em><span class="swiftcode"><span class="swiftdefined">SortableList</span></span></em>'s sort method.  Swift comes with a defined "<" operator for <em><span class="swiftcode"><span class="swiftclass">String</span></span></em>s, and so inside the closure, all that is needed is to force type cast <em><span class="swiftcode">o1</span></em> and <em><span class="swiftcode">o2</span></em> from <em><span class="swiftcode"><span class="swiftclass">Any</span></span></em> type to <em><span class="swiftcode"><span class="swiftclass">String</span></span></em> type and use the "<" operator for comparision.  Type casting to <em><span class="swiftcode"><span class="swiftclass">String</span></span></em> in this way is not very safe, but in this case all the items on the list are <em><span class="swiftcode"><span class="swiftclass">String</span></span></em>s, and so there will be no problem at runtime.  For more explanation on closures and their syntax read on <a href="https://developer.apple.com/library/prerelease/ios/documentation/Swift/Conceptual/Swift_Programming_Language/Closures.html#//apple_ref/doc/uid/TP40014097-CH11-ID94">Closures</a>.
+		</p>
+		
+		</p>
+		Run the program, if your implementation is right you should get the following output:
+		</p>
+		
+<pre class="output">
+(Array) 0->[Item V, Item E, Item S, Item M]<-3
+Setting array[2] to Item V
+(Array) 0->[Item V, Item E, Item V, Item M]<-3
+Sorting array
+array[0]=Item E
+array[1]=Item M
+array[2]=Item V
+array[3]=Item V
+</pre>
+
+		<p>
+		Once again, your print out of the array list might not be exactly the same, depending whether you chose to, and how you chose to, override the description method.  In the above output, the new method adds "(Array)" string at the beginning of the print out along with the first and last index value.
+		</p>
+		
+	  <h3>Array internals</h3>
+			
+		<p>
+		Arrays are not typically implemented as linked lists—in fact, the whole point of having an indexed data structure is to have it in a contiguous memory block where index facilitates instant computation of the offset for a given item from the beginning of the array.  Hence, the SCL's <em><span class="swiftcode"><span class="swiftdefined">Array</span></span></em> is doomed to be slow.  However, there's one aspect that can be improved on, and it presents an opportunity for more practice with inheritance.
+		</p>
+		
+		<p>
+		The element count plays an important role in an array, because array users need to keep checking the array size to make sure that they don't try to access items out of bounds.  Hence, the <em><span class="swiftcode">count</span></em> property is likely to get much heavier use on an <em><span class="swiftcode"><span class="swiftdefined">Array</span></span></em> object than other <em><span class="swiftcode"><span class="swiftdefined">LinkedList</span></span></em> objects.  If you followed the examples of the <em><span class="swiftcode"><span class="swiftdefined">Stack</span></span></em> and <em><span class="swiftcode"><span class="swiftdefined">SortableList</span></span></em>, your implementation of  <em><span class="swiftcode"><span class="swiftdefined">Array</span></span></em> at the moment inherits <em><span class="swiftcode"><span class="swiftdefined">LinkedList</span></span></em>'s computed property <em><span class="swiftcode">count</span></em>.  <em><span class="swiftcode"><span class="swiftdefined">LinkedList</span></span></em>'s implementation of <em><span class="swiftcode">count</span></em> is very inefficient, because it traverses the list and counts the object every time the method is invoked.  It's more efficient to have a variable that keeps the count of items in the array.  This variable must be updated whenever elements are added/removed to/from the array.  Given this variable, the stored property <em><span class="swiftcode">count</span></em> can be overriden to simply return the count instead of traversing the list every time.  Here's how this can be done (the code below doesn't give the entire implementation of <em><span class="swiftcode"><span class="swiftdefined">Array</span></span></em>—it should be just supplementing your current implementation): 
+		</p>
+			
+		<div class="codeblock">
+<div class="codeblocktitle"><a href="code/01/Array.swift">Array.swift</a></div>
+<pre class="linenumbers unselectable" style="float: left;">01:
+02:
+03:
+04:
+05:
+06:
+07:
+08:
+09:
+10:
+11:
+12:
+13:
+14:
+15:
+16:
+17:
+18:
+19:
+20:
+21:
+22:
+23:
+24:
+25:
+26:
+27:
+28:
+29:
+30:
+31:
+32:
+33:
+34:
+35:
+36:
+37:
+38:
+39:
+40:
+41:
+42:
+43:
+44:
+45:
+46:
+47:
+48:
+49:
+50:
+51:
+52:
+53:
+54:
+55:
+56:
+57:
+58:
+59:
+60:
+61:
+62:
+63:
+64:
+65:
+66:
+67:
+68:
+69:
+</pre><pre class="code">
+<span class="swiftcode"><span class="swiftkeyword">import</span> Foundation</span>
+<span class="swiftcode"></span>
+<span class="swiftcode"><span class="swiftcomment">/**</span></span>
+<span class="swiftcode"><span class="swiftcomment">Indexed array of objects</span></span>
+<span class="swiftcode"><span class="swiftcomment"></span></span>
+<span class="swiftcode"><span class="swiftcomment">*/</span></span>
+<span class="swiftcode"><span class="swiftkeyword">class</span> <span class="swiftdefined">Array</span> : <span class="swiftdefined">SortableList</span> {</span>
+<span class="swiftcode">    </span>
+<span class="swiftcode">    <span class="swiftcomment">// STORED PROPERTIES</span></span>
+<span class="swiftcode">    </span>
+<span class="swiftcode">    <span class="swiftkeyword">private</span> <span class="swiftkeyword">var</span> _count: <span class="swiftclass">Int</span>    <span class="swiftcomment">// Stored property that counts elements in the array</span></span>
+<span class="swiftcode">    </span>
+<span class="swiftcode">    <span class="swiftcomment">// COMPUTED PROPERTIES</span></span>
+<span class="swiftcode">    </span>
+<span class="swiftcode">    <span class="swiftcomment">/**</span></span>
+<span class="swiftcode"><span class="swiftcomment">    Computed property that returns the number of elements in the array - overrides</span></span>
+<span class="swiftcode"><span class="swiftcomment">    LinkedList property to return stored _count property rather than traversing</span></span>
+<span class="swiftcode"><span class="swiftcomment">    the list and coutning the elements.</span></span>
+<span class="swiftcode"><span class="swiftcomment"></span></span>
+<span class="swiftcode"><span class="swiftcomment">    - returns: Int Number of items in the array</span></span>
+<span class="swiftcode"><span class="swiftcomment">    */</span></span>
+<span class="swiftcode">    <span class="swiftkeyword">override</span> <span class="swiftkeyword">var</span> count: <span class="swiftclass">Int</span> {</span>
+<span class="swiftcode">        <span class="swiftkeyword">return</span> <span class="swiftkeyword">self</span>._count</span>
+<span class="swiftcode">    }</span>
+<span class="swiftcode"></span>
+<span class="swiftcode">    <span class="swiftcomment">// INITIALISERS</span></span>
+<span class="swiftcode">    </span>
+<span class="swiftcode">    <span class="swiftcomment">/**</span></span>
+<span class="swiftcode"><span class="swiftcomment">    Designated initialiser for Array - overrides LinkedList initialiser</span></span>
+<span class="swiftcode"><span class="swiftcomment">    in order to initialise the _count stored property</span></span>
+<span class="swiftcode"><span class="swiftcomment">    </span></span>
+<span class="swiftcode"><span class="swiftcomment">    - parameter list: LinkedList to initialise array with (nil by default)</span></span>
+<span class="swiftcode"><span class="swiftcomment">    */</span></span>
+<span class="swiftcode">    <span class="swiftkeyword">override</span> <span class="swiftkeyword">init</span>(list: <span class="swiftdefined">LinkedList</span>? = nil) {</span>
+<span class="swiftcode">        <span class="swiftkeyword">self</span>._count = <span class="swiftnumber">0</span> </span>
+<span class="swiftcode">        <span class="swiftkeyword">super</span>.<span class="swiftkeyword">init</span>(list: list)</span>
+<span class="swiftcode">    }</span>
+<span class="swiftcode"></span>
+<span class="swiftcode">    <span class="swiftcomment">// METHODS</span></span>
+<span class="swiftcode">    </span>
+<span class="swiftcode">    <span class="swiftcomment">/**</span></span>
+<span class="swiftcode"><span class="swiftcomment">    Adds an object to the array - overrrides LinkedList method</span></span>
+<span class="swiftcode"><span class="swiftcomment">    in order to increment the _count variable when new object</span></span>
+<span class="swiftcode"><span class="swiftcomment">    is added.</span></span>
+<span class="swiftcode"><span class="swiftcomment">    </span></span>
+<span class="swiftcode"><span class="swiftcomment">    - parameter object: Object to add to the list</span></span>
+<span class="swiftcode"><span class="swiftcomment">    */</span></span>
+<span class="swiftcode">    <span class="swiftkeyword">override</span> <span class="swiftkeyword">func</span> add(object: <span class="swiftclass">Any</span>) {</span>
+<span class="swiftcode">        <span class="swiftkeyword">super</span>.add(object: object)</span>
+<span class="swiftcode">        <span class="swiftkeyword">self</span>._count += <span class="swiftnumber">1</span> </span>
+<span class="swiftcode">    }</span>
+<span class="swiftcode"></span>
+<span class="swiftcode">    <span class="swiftcomment">/**</span></span>
+<span class="swiftcode"><span class="swiftcomment">    Removes a node from the array - overrideds LinkedList method</span></span>
+<span class="swiftcode"><span class="swiftcomment">    in order to decrement the _count variable when an node (and object)</span></span>
+<span class="swiftcode"><span class="swiftcomment">    is removed form the list</span></span>
+<span class="swiftcode"><span class="swiftcomment">    </span></span>
+<span class="swiftcode"><span class="swiftcomment">    - parameter node: Node to remove from the list</span></span>
+<span class="swiftcode"><span class="swiftcomment">    - returns: Bool True if node found in the list and removed,</span></span>
+<span class="swiftcode"><span class="swiftcomment">    false otherwise.</span></span>
+<span class="swiftcode"><span class="swiftcomment">    */</span></span>
+<span class="swiftcode">    <span class="swiftkeyword">override</span> <span class="swiftkeyword">func</span> remove(node: <span class="swiftdefined">Node</span>) -&gt; <span class="swiftclass">Bool</span> {</span>
+<span class="swiftcode">        <span class="swiftkeyword">let</span> nodeRemoved: <span class="swiftclass">Bool</span> = <span class="swiftkeyword">super</span>.remove(node: node)</span>
+<span class="swiftcode">        <span class="swiftkeyword">if</span> nodeRemoved {</span>
+<span class="swiftcode">            <span class="swiftkeyword">self</span>._count -= <span class="swiftnumber">1</span> </span>
+<span class="swiftcode">        }</span>
+<span class="swiftcode">        <span class="swiftkeyword">return</span> nodeRemoved</span>
+<span class="swiftcode">    }</span>
+<span class="swiftcode">}</span>
+</pre>
+</div>
+	
+		
+		<p>
+		Let's go over the introduced changes one by one.  A new private stored property called <em><span class="swiftcode">_count</span></em> is added to <em><span class="swiftcode"><span class="swiftdefined">Array</span></span></em>, and the computed <em><span class="swiftcode">count</span></em> method is overriden to simply return the <em><span class="swiftcode">_count</span></em> value. Whereas before, initialisation method was inherited from <em><span class="swiftcode"><span class="swiftdefined">LinkedList</span></span></em>, now the <em><span class="swiftcode"><span class="swiftkeyword">init</span></span></em> method is overriden, because the new stored property needs to initialised by the <em><span class="swiftcode"><span class="swiftdefined">Array</span></span></em> class.  The reminder of initialisation remains the same, and so it can be done with a call to parent's initialiser.
+		</p>
+		
+		<p>
+		In this exercise you were guided to implement the SCL heirarchy in such a way, so that an addition of the new object to the list always goes through <em><span class="swiftcode"><span class="swiftdefined">LinkedList</span></span></em>'s <em><span class="swiftcode">add</span></em> method and a removal of an object form the list always goes through <em><span class="swiftcode"><span class="swiftdefined">LinkedList</span></span></em>'s <em><span class="swiftcode">remove</span></em> method.  Hence, in order to maintain the <em><span class="swiftcode">_count</span></em> in synch with the number of elements in the list, all that is required is overriding those two methods.  The new <em><span class="swiftcode">add</span></em> simply calls the parent method and follows with increment of the <em><span class="swiftcode">_count</span></em> property.  The new <em><span class="swiftcode">remove</span></em> method check if removal using parent method was successful before decrementing the <em><span class="swiftcode">_count</span></em> property.		
+		</p>
+		
+		<p>
+		Note that <em><span class="swiftcode"><span class="swiftdefined">Array</span></span></em>'s interface hasn't changed, yet its internal behaviour has been modified to speed up the call to <em><span class="swiftcode">_count</span></em>.  All it took is understanding of <em><span class="swiftcode"><span class="swiftdefined">LinkedList</span></span></em>'s internals and overriding of certain methods such that they still invokes parent's implementation.  The output of the program in <em>main.swift</em> should remain the same.  The speed improvement for invocation of <em><span class="swiftcode">count</span></em> will not be noticeable, but it would make quite a difference if one was to repeatedly iterate over large arrays. 
+		</p>  
+		
+      <h3>Subscripts</h3>
+
+		<p>
+		Part of the job of the <em>Toolmaker</em> is to provide the <em>Builder</em> with a nice interface.  In case of arrays, it would be nice to be able to access its elements using the square bracket syntax—that is, to be able to write "<em><span class="swiftcode">array[<span class="swiftnumber">2</span>] = str3</span></em>" instead of "<em><span class="swiftcode">array.setObject(str3, at: <span class="swiftnumber">2</span>)</span></em>".  Swift allows definition of bracket notation on objects through the computed <em><span class="swiftcode"><span class="swiftkeyword">subscript</span></span></em> property.  For the <em><span class="swiftcode"><span class="swiftdefined">Array</span></span></em> class, the required getter and setter code can simply wrap the <em><span class="swiftcode">getObject</span></em> and <em><span class="swiftcode">setObject</span></em> methods, as shown below (again, the entire class is not shown, just the method in question):  
+		</p>
+
+		<div class="codeblock">
+<div class="codeblocktitle"><a href="code/01/Array.swift">Array.swift</a></div>
+<pre class="linenumbers unselectable" style="float: left;">01:
+02:
+03:
+04:
+05:
+06:
+07:
+08:
+09:
+10:
+11:
+12:
+13:
+14:
+15:
+16:
+17:
+18:
+19:
+20:
+21:
+22:
+23:
+</pre><pre class="code">
+<span class="swiftcode"><span class="swiftkeyword">import</span> Foundation</span>
+<span class="swiftcode"></span>
+<span class="swiftcode"><span class="swiftcomment">/**</span></span>
+<span class="swiftcode"><span class="swiftcomment">Indexed array of objects</span></span>
+<span class="swiftcode"><span class="swiftcomment"></span></span>
+<span class="swiftcode"><span class="swiftcomment">*/</span></span>
+<span class="swiftcode"><span class="swiftkeyword">class</span> <span class="swiftdefined">Array</span> : <span class="swiftdefined">SortableList</span> {</span>
+<span class="swiftcode">    </span>
+<span class="swiftcode">    <span class="swiftcomment">/**</span></span>
+<span class="swiftcode"><span class="swiftcomment">    Method for indexed square bracket notation that</span></span>
+<span class="swiftcode"><span class="swiftcomment">    wraps the getObject and setObject methods</span></span>
+<span class="swiftcode"><span class="swiftcomment">    </span></span>
+<span class="swiftcode"><span class="swiftcomment">    - parameter index: Index of the item in the array</span></span>
+<span class="swiftcode"><span class="swiftcomment">    */</span></span>
+<span class="swiftcode">    <span class="swiftkeyword">subscript</span>(index: <span class="swiftclass">Int</span>) -&gt; <span class="swiftclass">Any</span> {</span>
+<span class="swiftcode">        <span class="swiftkeyword">get</span> {</span>
+<span class="swiftcode">            <span class="swiftkeyword">return</span> <span class="swiftkeyword">self</span>.<span class="swiftkeyword">get</span>(index: index)</span>
+<span class="swiftcode">        }</span>
+<span class="swiftcode">        <span class="swiftkeyword">set</span>(newObject) {</span>
+<span class="swiftcode">            <span class="swiftkeyword">self</span>.<span class="swiftkeyword">set</span>(object: newObject, at: index)</span>
+<span class="swiftcode">        }</span>
+<span class="swiftcode">    }</span>
+<span class="swiftcode">}</span>
+</pre>
+</div>
+	
+
+		<p>
+		Once you add the above <em><span class="swiftcode"><span class="swiftkeyword">subscript</span></span></em> computed property to <em><span class="swiftcode"><span class="swiftdefined">Array</span></span></em>, you can change the code in <em>main.swift</em> as follows, without impacting the program output:
+
+		<div class="codeblock">
+<div class="codeblocktitle"><a href="code/01/main_05.swift">main.swift</a></div>
+<pre class="linenumbers unselectable" style="float: left;"><span class="codeold">01:
+</span><span class="codeold">02:
+</span><span class="codeold">03:
+</span><span class="codeold">04:
+</span><span class="codeold">05:
+</span><span class="codeold">06:
+</span><span class="codeold">07:
+</span><span class="codeold">08:
+</span><span class="codeold">09:
+</span><span class="codeold">10:
+</span><span class="codeold">11:
+</span><span class="codeold">12:
+</span><span class="codeold">13:
+</span><span class="codeold">14:
+</span><span class="codeold">15:
+</span><span class="codeold">16:
+</span><span class="codeold">17:
+</span><span class="codeold">18:
+</span><span class="codeold">19:
+</span><span class="codeold">20:
+</span><span class="codeold">21:
+</span><span class="codeold">22:
+</span><span class="codeold">23:
+</span><span class="codeold">24:
+</span><span class="codeold">25:
+</span><span class="codeold">26:
+</span><span class="codeold">27:
+</span><span class="codeold">28:
+</span><span class="codeold">29:
+</span><span class="codeold">30:
+</span><span class="codeold">31:
+</span><span class="codeold">32:
+</span><span class="codeold">33:
+</span><span class="codeold">34:
+</span><span class="codeold">35:
+</span><span class="codeold">36:
+</span><span class="codeold">37:
+</span><span class="codeold">38:
+</span><span class="codeold">39:
+</span><span class="codeold">40:
+</span><span class="codeold">41:
+</span><span class="codeold">42:
+</span><span class="codeold">43:
+</span><span class="codeold">44:
+</span>45:
+<span class="codeold">46:
+</span><span class="codeold">47:
+</span><span class="codeold">48:
+</span><span class="codeold">49:
+</span><span class="codeold">50:
+</span>51:
+<span class="codeold">52:
+</span></pre><pre class="code">
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">import</span> Foundation</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">let</span> str1: <span class="swiftclass">String</span> = <span class="swiftstring">"Item V"</span>;</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">let</span> str2: <span class="swiftclass">String</span> = <span class="swiftstring">"Item E"</span>;</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">let</span> str3: <span class="swiftclass">String</span> = <span class="swiftstring">"Item S"</span>;</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">let</span> str4: <span class="swiftclass">String</span> = <span class="swiftstring">"Item M"</span>;</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">var</span> list: <span class="swiftdefined">LinkedList</span> = <span class="swiftdefined">LinkedList</span>()</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"</span></span><span class="codeswift">\<span class="swiftstring">(</span>list<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="codeold"><span class="swiftcode">list.add(object: str1)</span></span>
+<span class="codeold"><span class="swiftcode">list.add(object: str2)</span></span>
+<span class="codeold"><span class="swiftcode">list.add(object: str3)</span></span>
+<span class="codeold"><span class="swiftcode">list.add(object: str4)</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"</span></span><span class="codeswift">\<span class="swiftstring">(</span>list<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">var</span> queue: <span class="swiftdefined">Queue</span> = <span class="swiftdefined">Queue</span>(list: list)</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"\n</span></span><span class="codeswift">\<span class="swiftstring">(</span>queue<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">if</span> <span class="swiftkeyword">let</span> item1 = queue.<span class="swiftkeyword">get</span>() {</span></span>
+<span class="codeold"><span class="swiftcode">    <span class="swiftfunction">print</span>(<span class="swiftstring">"Got item: </span></span><span class="codeswift">\<span class="swiftstring">(</span>item1 <span class="swiftkeyword">as</span>! <span class="swiftclass">String</span><span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode">}</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"</span></span><span class="codeswift">\<span class="swiftstring">(</span>queue<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"Putting item: </span></span><span class="codeswift">\<span class="swiftstring">(</span>str2<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode">queue.put(object: str2)</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"</span></span><span class="codeswift">\<span class="swiftstring">(</span>queue<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">var</span> stack: <span class="swiftdefined">Stack</span> = <span class="swiftdefined">Stack</span>(list: list)</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"\n</span></span><span class="codeswift">\<span class="swiftstring">(</span>stack<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">if</span> <span class="swiftkeyword">let</span> item2 = stack.pop() {</span></span>
+<span class="codeold"><span class="swiftcode">    <span class="swiftfunction">print</span>(<span class="swiftstring">"Popped item: </span></span><span class="codeswift">\<span class="swiftstring">(</span>item2 <span class="swiftkeyword">as</span>! <span class="swiftclass">String</span><span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode">}</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"</span></span><span class="codeswift">\<span class="swiftstring">(</span>stack<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"Pushing item: </span></span><span class="codeswift">\<span class="swiftstring">(</span>str2<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode">stack.push(object: str2)</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"</span></span><span class="codeswift">\<span class="swiftstring">(</span>stack<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">var</span> array: <span class="swiftdefined">Array</span> = <span class="swiftdefined">Array</span>(list: list)</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"\n</span></span><span class="codeswift">\<span class="swiftstring">(</span>array<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"Setting array[2] to </span></span><span class="codeswift">\<span class="swiftstring">(</span>str1<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="swiftcode">array[<span class="swiftnumber">2</span>] = str1</span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"</span></span><span class="codeswift">\<span class="swiftstring">(</span>array<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span></span>
+<span class="codeold"><span class="swiftcode"></span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftfunction">print</span>(<span class="swiftstring">"Sorting array"</span>);</span></span>
+<span class="codeold"><span class="swiftcode">array.sort(isObject: { o1, o2 <span class="swiftkeyword">in</span> (o1 <span class="swiftkeyword">as</span>! <span class="swiftclass">String</span>) &lt; (o2 <span class="swiftkeyword">as</span>! <span class="swiftclass">String</span>) })</span></span>
+<span class="codeold"><span class="swiftcode"><span class="swiftkeyword">for</span> index <span class="swiftkeyword">in</span> <span class="swiftnumber">0</span>..&lt;array.count {</span></span>
+<span class="swiftcode">    <span class="swiftfunction">print</span>(<span class="swiftstring">"array[</span></span><span class="codeswift">\<span class="swiftstring">(</span>index<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">]=</span></span><span class="codeswift">\<span class="swiftstring">(</span>array[index]<span class="swiftstring">)</span></span><span class="swiftcode"><span class="swiftstring">"</span>)</span>
+<span class="codeold"><span class="swiftcode">}</span></span>
+</pre>
+</div>
+				
+						</div>
+	
+	<h2>Simple Container Library II</h2>
+	<div class="block">
+
+		<p>In the previous exercise you have implemented a simple container library.  Hopefully, thanks to inheritance, this didn’t take you too much time.  Still, you managed to create a library with quite an assortment of tools for organising collections of objects: a linked list, queue, stack and an array.  Try to answer the following questions:
+		</p>
+		
+		<p>
+		<em>Question 1:</em> What was the point of creating the <em><span class="swiftcode"><span class="swiftdefined">SortableList</span></span></em> class, as opposed to implementing all its functions in the <em><span class="swiftcode"><span class="swiftdefined">Array</span></span></em> class?
+		</p>
+		
+		<p>
+		<em>Question 2:</em> Can you think of another type of container that is not an <em><span class="swiftcode"><span class="swiftdefined">Array</span></span></em>, but could inherit from <em><span class="swiftcode"><span class="swiftdefined">SortableList</span></span></em>?  If you can’t think of anything at this time, could there be still a good reason to have the <em><span class="swiftcode"><span class="swiftdefined">SortableList</span></span></em> in the SCL hierarchy?
+		</p>
+		
+		<p>
+		Does the relationship between <em><span class="swiftcode"><span class="swiftdefined">Queue</span></span></em> and <em><span class="swiftcode"><span class="swiftdefined">LinkedList</span></span></em> seem right?  Is a queue a linked list, or should it contain a linked list?  Same goes for <em><span class="swiftcode"><span class="swiftdefined">Stack</span></span></em>—should it inherit from <em><span class="swiftcode"><span class="swiftdefined">LinkedList</span></span></em> or should it just contain a list?  Take a look at their class diagrams.  Notice for instance, that through inheritance, both the <em><span class="swiftcode"><span class="swiftdefined">Stack</span></span></em> and <em><span class="swiftcode"><span class="swiftdefined">Queue</span></span></em> classes provides the <em><span class="swiftcode">remove</span></em> method.  This method allows for object removal from any part of the list...and that's not really desired for either a queue or a stack.
+		</p>
+		
+		<p>
+		As a <em>Toolmaker</em> you have a choice.  When creating object hierarchies you can ignore the fact that some inherited methods make no sense or should not be used by the child object.  Sometimes it's reasonable to assume that a <em>Builder</em> will not misuse inherited methods—especially if the <em>Builder</em> is you.  Another way is to override undesired method with calls to assertions (or exceptions).  This will prevent the method from use by crashing the program—hopefully during testing phase and not in operation.  Though this second path is often taken, you can imagine that it's generally considered a bad practice.
+		</p>
+		
+		<p>
+		There is a third option—to use composition instead of inheritance.  The most common OOP mistake made by a novice programmer is overuse of inheritance.  Inheritance is tempting because of it allows code reuse.  However, sometimes a little bit extra effort is worthwhile, especially if it prevents potential misuse of objects of your class. 
+		</p>  
+		
+		<p>In this part of the exercise, you'll be creating a second version of SCL.  Create new Xcode project, name it "prog4.2".  Add <a href="code/01/LinkedList.swift"><em>LinkedList.swift</em></a> to the project—the same one as in the first part of this lab.  The <em><span class="swiftcode"><span class="swiftdefined">Node</span></span></em> and <em><span class="swiftcode"><span class="swiftdefined">LinkedList</span></span></em> classes will remain unchanged.</p>
+		</p>
+
+		<p>Create new versions of <em><span class="swiftcode"><span class="swiftdefined">Queue</span></span></em>, <em><span class="swiftcode"><span class="swiftdefined">Stack</span></span></em>, and <em><span class="swiftcode"><span class="swiftdefined">Array</span></span></em> that conform to the class diagrams shown below:
+		</p>
+		<img class="block" src="images/cd_queue2.png" style="max-width:716px;" title="Queue class diagram">
+
+		<img class="block" src="images/cd_stack2.png" style="max-width:724px;" title="Stack class diagram">
+
+		<img class="block" src="images/cd_array2.png" style="max-width:803px;" title="Array class diagram">
+
+		<p>
+		The three classes above do not inherit from <em><span class="swiftcode"><span class="swiftdefined">LinkedList</span></span></em>, but have a stored property, called <em><span class="swiftcode">list</span></em>, of <em><span class="swiftcode"><span class="swiftdefined">LinkedList</span></span></em> type to/from which objects can be added and removed.  All other details of the implementation are up to you—just make sure that these classes don't provide only the methods listed in the diagram (initialisers are not shown).  Though, at first, it might seem like a lot of work, you can do everything reusing the code from SCL I.  Most of it will be modification of certain references to <em><span class="swiftcode"><span class="swiftkeyword">self</span></span></em> that now will be references to the contained <em><span class="swiftcode">list</span></em> object.  The <em><span class="swiftcode">empty</span></em>, <em><span class="swiftcode">count</span></em> and <em><span class="swiftcode">discription</span></em> properties will not be inherited from <em><span class="swiftcode"><span class="swiftdefined">LinkedList</span></span></em> anymore, but they don't need to do much more beyond wrapping the calls to <em><span class="swiftcode">list</span></em>'s methods.  You don't have to implement the <em><span class="swiftcode"><span class="swiftdefined">SortableList</span></span></em>, but you may chose to do it as a parent of <em><span class="swiftcode"><span class="swiftdefined">Array</span></span></em>.  Regardless of whether you chose to have a <em><span class="swiftcode"><span class="swiftdefined">SortableList</span></span></em> or not, you will need to extend <em><span class="swiftcode"><span class="swiftdefined">Node</span></span></em> to add the <em><span class="swiftcode">swapObjectsWith</span></em> method like what was done previously, and the <em><span class="swiftcode">sort</span></em> method needs to be working for the <em><span class="swiftcode"><span class="swiftdefined">Array</span></span></em> class.
+		</p>
+		
+		<p>
+		Hopefully over the course of implementation of SCL II you've been reflecting on similarities and differences of inheritance and composition.  In this case, it's not entirely clear that one approach is better than the other—there are pros and cons in either case.  When designing OOP programs/libraries it's best to carefully consider implications of going one way or another, and make an informed decision on which one will be more appropriate. 
+		</p>
+
+	</div>	
+
+
+
+
+
+	<div class="banner">
+		<a href="http://cs.otago.ac.nz/cosc346/labs.php">COSC346 - Object Oriented Programming and User Interfaces</a>
+	</div>
+	</body>
+</html>
